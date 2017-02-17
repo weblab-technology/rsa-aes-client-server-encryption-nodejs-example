@@ -1,0 +1,11 @@
+{
+  "name": "socket-encryption",
+  "version": "1.0.0",
+  "description": "encryption application",
+  "dependencies": {
+    "express": "^4.14.1",
+    "io": "^0.1.10",
+    "node-rsa": "^0.4.2",
+    "socket.io": "^1.7.2"
+  }
+}

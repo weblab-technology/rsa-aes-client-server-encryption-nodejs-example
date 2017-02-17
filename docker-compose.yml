@@ -1,0 +1,11 @@
+version: '2'
+
+services:
+  node:
+    image: node:6
+    ports:
+     - "3000:3000"
+    tty: true
+    working_dir: /code
+    volumes:
+      - .:/code
