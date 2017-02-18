@@ -13,28 +13,31 @@ app.use(express.static(__dirname + '/static'));
 
 // web socket connection event
 io.on('connection', function(socket){
-    let message =  'Hello';
-    let encrypted = rsaWrapper.encrypt(rsaWrapper.clientPub, message);
 
+    // Test sending to client dummy RSA message
+    let encrypted = rsaWrapper.encrypt(rsaWrapper.clientPub, 'Hello RSA message from client to server');
     socket.emit('rsa server encrypted message', encrypted);
 
+    // Test accepting dummy RSA message from client
     socket.on('rsa client encrypted message', function (data) {
-        console.log('server received RSA message from client');
-        console.log(data);
-        console.log(rsaWrapper.decrypt(rsaWrapper.serverPrivate, data));
+        console.log('Server received RSA message from client');
+        console.log('Encrypted message is', '\n', data);
+        console.log('Decrypted message', '\n', rsaWrapper.decrypt(rsaWrapper.serverPrivate, data));
     });
 
-    let aesKey = aesWrapper.generateKey();
-    let aesIv = aesWrapper.generateIv();
-    let encryptedMessage = aesWrapper.encrypt(aesKey, aesIv, 'Server AES message');
-    encryptedMessage = aesWrapper.addIvToBody(aesIv, encryptedMessage);
+    // Test AES key sending
+    const aesKey = aesWrapper.generateKey();
+    let encryptedAesKey = rsaWrapper.encrypt(rsaWrapper.clientPub, (aesKey.toString('base64')));
+    socket.emit('send key from server to client', encryptedAesKey);
 
-    socket.emit('aes server encrypted message', { key:aesKey.toString('base64'), message: encryptedMessage});
-
+    // Test accepting dummy AES key message
     socket.on('aes client encrypted message', function (data) {
-        console.log('server received AES message from client');
-        console.log(data);
-        console.log(aesWrapper.decrypt(aesKey, data));
+        // console.log('Server received AES message from client', '\n', 'Encrypted message is', '\n', data);
+        console.log('Decrypted message', '\n', aesWrapper.decrypt(aesKey, data));
+
+        // Test send client dummy AES message
+        let message = aesWrapper.createAesMessage(aesKey, 'Server AES message');
+        socket.emit('aes server encrypted message', message);
     });
 });
 

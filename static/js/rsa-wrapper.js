@@ -52,7 +52,17 @@
         });
     }
 
+    function checkSign(keyInPemFormat, encryptedBase64Message) {
+        console.log(encryptedBase64Message.substr(-344));
+    }
+
+    function decryptWithSignature() {
+
+    }
+
     window.rsaWrapper = {
+        checkSign: checkSign,
+        decryptWithSignature: decryptWithSignature,
         importPrivateKey: importPrivateKey,
         importPublicKey: importPublicKey,
         privateDecrypt: privateDecrypt,

@@ -1,0 +1,32 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font: 13px Helvetica, Arial;
+}
+
+textarea {
+    width: 300px;
+    height: 200px;
+}
+
+.container{
+    padding-bottom: 30px;
+}
+
+.log-container{
+    padding: 10px;
+}
+
+.container .text-container {
+    width: 320px;
+    height: 210px;
+    float: left;
+    padding: 10px;
+}
+#log div{
+    margin-top: 20px;
+}

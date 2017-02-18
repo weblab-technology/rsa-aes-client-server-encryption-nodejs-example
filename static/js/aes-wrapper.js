@@ -37,20 +37,22 @@
         var iv = window.crypto.getRandomValues(new Uint8Array(16));
 
         return new Promise(function (resolve, rej) {
-            crypto.encrypt(
-                {
-                    name: "AES-CBC",
-                    //Don't re-use initialization vectors!
-                    //Always generate a new iv every time your encrypt!
-                    iv: iv
-                },
-                key, //from generateKey or importKey above
-                converterWrapper.str2abUtf8(message) //ArrayBuffer of data you want to encrypt
-            )
-                .then(function (encrypted) {
-                    encrypted = getMessageWithIv(encrypted, iv);
-                    resolve(encrypted);
-                });
+            importPublicKey(key).then(function (key) {
+                crypto.encrypt(
+                    {
+                        name: "AES-CBC",
+                        //Don't re-use initialization vectors!
+                        //Always generate a new iv every time your encrypt!
+                        iv: iv
+                    },
+                    key, //from generateKey or importKey above
+                    converterWrapper.str2abUtf8(message) //ArrayBuffer of data you want to encrypt
+                )
+                    .then(function (encrypted) {
+                        encrypted = getMessageWithIv(encrypted, iv);
+                        resolve(encrypted);
+                    });
+            });
         });
     }
 
@@ -58,17 +60,19 @@
         var data = aesWrapper.separateVectorFromData(message);
 
         return new Promise(function (resolve, rej) {
-            crypto.decrypt(
-                {
-                    name: "AES-CBC",
-                    iv: converterWrapper.base64StringToArrayBuffer(data['iv']),
-                },
-                key, //from generateKey or importKey above
-                converterWrapper.base64StringToArrayBuffer(data['message']) //ArrayBuffer of data you want to encrypt
-            )
-                .then(function (decrypted) {
-                    resolve(converterWrapper.arrayBufferToUtf8(decrypted));
-                });
+            importPublicKey(key).then(function (key) {
+                crypto.decrypt(
+                    {
+                        name: "AES-CBC",
+                        iv: converterWrapper.base64StringToArrayBuffer(data['iv']),
+                    },
+                    key, //from generateKey or importKey above
+                    converterWrapper.base64StringToArrayBuffer(data['message']) //ArrayBuffer of data you want to encrypt
+                )
+                    .then(function (decrypted) {
+                        resolve(converterWrapper.arrayBufferToUtf8(decrypted));
+                    });
+            });
         });
     }
 

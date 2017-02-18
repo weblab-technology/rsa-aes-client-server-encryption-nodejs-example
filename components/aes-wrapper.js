@@ -45,12 +45,19 @@ aesWrapper.decrypt = (key, text) => {
     return dec;
 };
 
-
 aesWrapper.addIvToBody = (iv, encryptedBase64) => {
     encryptedBase64 += iv.toString('base64');
     console.log(iv.toString('base64'));
 
     return encryptedBase64;
+};
+
+aesWrapper.createAesMessage = (aesKey, message) => {
+    let aesIv = aesWrapper.generateIv();
+    let encryptedMessage = aesWrapper.encrypt(aesKey, aesIv, message);
+    encryptedMessage = aesWrapper.addIvToBody(aesIv, encryptedMessage);
+
+    return encryptedMessage;
 };
 
 module.exports = aesWrapper;

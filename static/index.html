@@ -2,21 +2,14 @@
 <html>
 <head>
     <title>Encryption/decryption RSA AES</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font: 13px Helvetica, Arial; }
-        textarea{
-            width: 400px;
-            height: 300px;
-        }
-    </style>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" type="text/css" href="/css/style.css" />
 </head>
 <body>
-
-<div>
-    <h2>Server public key</h2>
-<textarea id="server_public" >
+<div class="container">
+    <div class="text-container">
+        <h2>Server public key</h2>
+        <textarea id="server_public">
 -----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnPQ6+vqnIwpYLNmM0DvP
 jWYoaZHV6rW4HcofqyjUO8rzQSEmfgT+quTzPsNcnAqHVC7IGafomu8Y82wX6JPK
@@ -27,11 +20,11 @@ nx2Wq6X4OC6Y5MaB64MzspDTND5gzwPNTibcw3s/59o+FV22drhCwylUxuWUhakP
 LQIDAQAB
 -----END PUBLIC KEY-----
 </textarea>
-</div>
+    </div>
 
-<div>
-    <h2>Client public key</h2>
-<textarea id="client_public">
+    <div class="text-container">
+        <h2>Client public key</h2>
+        <textarea id="client_public">
 -----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAj3esh+8vIdSIb44d0yGB
 WDwOgQDAUqbZbSUkS7ho9OP3ptopmqw20Bc37RfKAqEjqY88kzl011BWw/MB/u0w
@@ -42,11 +35,11 @@ vSJCSBe+qleaecxrLR3P8Xs5HLYu3Mc4Sssdu+/3bBbUKufnxaTX6Rkp+SfxwGyK
 rwIDAQAB
 -----END PUBLIC KEY-----
 </textarea>
-</div>
+    </div>
 
-<div>
-    <h2>Client private key</h2>
-<textarea id="client_private">
+    <div  class="text-container">
+        <h2>Client private key</h2>
+        <textarea id="client_private">
 -----BEGIN PRIVATE KEY-----
 MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCPd6yH7y8h1Ihv
 jh3TIYFYPA6BAMBSptltJSRLuGj04/em2imarDbQFzftF8oCoSOpjzyTOXTXUFbD
@@ -76,46 +69,75 @@ u8ThbAvTm+yqMmsDNkBkohfx25p3NLsV0r46mpRXuraQTFXcYrc1mW+BkoteY06S
 Oe6lSHTplzRc0QPTat5+mQ==
 -----END PRIVATE KEY-----
 </textarea>
+    </div>
+    <div style="clear: both"></div>
+</div>
+
+<div class="log-container">
+    <h1>Log container</h1>
+    <div id="log" style="padding-top: 20px"></div>
 </div>
 
 <script src="/socket.io/socket.io.js"></script>
 <script src="/js/converter-wrapper.js"></script>
 <script src="/js/encoding.js"></script>
 <script src="/js/encoding-indexes.js"></script>
-<script src="/js/converter-wrapper.js"></script>
 <script src="/js/rsa-wrapper.js"></script>
 <script src="/js/aes-wrapper.js"></script>
 
 <script>
 
     var socket = io();
+    var aesKey;
 
+    // Test accepting and sending dummy message encrypted with RSA
     socket.on('rsa server encrypted message', function (msg) {
-
-        console.log('rsa server encrypted message');
-        console.log(msg);
+        // Test accepting dummy RSA message from server
+        addLog('RSA server encrypted dummy message', msg);
 
         rsaWrapper.privateDecrypt(document.getElementById('client_private').value, msg).then(function (decrypted) {
-            console.log(decrypted);
+            addLog('RSA server decrypted message', decrypted);
         });
 
-        rsaWrapper.publicEncrypt(document.getElementById('server_public').value, 'Приветосик').then(function (encrypted) {
-            console.log('RSA encrypted base64 message from client', '\n', encrypted);
+        // Test send to server dummy RSA message
+        rsaWrapper.publicEncrypt(document.getElementById('server_public').value, 'Hello from client with RSA').then(function (encrypted) {
+            addLog('RSA encrypted base64 message from client', encrypted);
             socket.emit('rsa client encrypted message', encrypted);
         });
     });
 
-    socket.on('aes server encrypted message', function (msg) {
-
-        aesWrapper.importPublicKey(msg.key).then(function (key) {
-            aesWrapper.decryptMessage(key, msg.message).then(function (dec) {
-                aesWrapper.encryptMessage(key, 'some message').then(function (encrypted) {
-                    socket.emit('aes client encrypted message', encrypted)
-                });
-            });
+    // Test accepting RSA encrypted AES key and sending AES encrypted message to server
+    socket.on('send key from server to client', function (data) {
+        addLog('Accepting RSA encrypted AES key', data);
+        rsaWrapper.privateDecrypt(document.getElementById('client_private').value, data).then(function (key) {
+            addLog('Decrypted AES key from server in base64 format', key);
+            aesKey = key;
+            aesWrapper.encryptMessage(key, 'Hello from client with AES').then(function (encrypted) {
+                addLog('Encrypted AES message from client to server in base64 format', encrypted);
+                socket.emit('aes client encrypted message', encrypted);
+            })
         });
-
     });
+
+    // Test decrypting AES message from server
+    socket.on('aes server encrypted message', function (msg) {
+        addLog('Encrypted AES message from server', msg);
+        aesWrapper.decryptMessage(aesKey, msg).then(function (dec) {
+            addLog('Decrypted AES message from server', dec);
+        });
+    });
+
+    function addLog(title, content) {
+        var iDiv = document.createElement('div');
+        var h = document.createElement('h2');
+        h.append(title);
+        iDiv.appendChild(h);
+        var p = document.createElement('p');
+        p.append(content);
+        iDiv.appendChild(p);
+        document.getElementById('log').appendChild(iDiv);
+        document.getElementById('log').appendChild(document.createElement('hr'));
+    }
 </script>
 </body>
 </html>
