@@ -1,4 +1,4 @@
-const rsaWrapper = require('./components');
+const rsaWrapper = require('./components/rsa-wrapper');
 
 rsaWrapper.generate('server');
 rsaWrapper.generate('client');
