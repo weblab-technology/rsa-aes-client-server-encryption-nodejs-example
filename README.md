@@ -25,7 +25,10 @@ Then overwrite textarea key values in static/index.html
 
 Run
 ---
-node start - starting web server with websockets on 3000 port
+~~~~~~~~~~~~~~~~~~
+node start
+~~~~~~~~~~~~~~~~~~
+starting web server with websockets on 3000 port
 
 Detail description in article
 -------------------
