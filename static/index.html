@@ -9,6 +9,8 @@
 <div class="container">
     <div class="text-container">
         <h2>Server public key</h2>
+
+        <!--Put server public key here-->
         <textarea id="server_public">
 -----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnPQ6+vqnIwpYLNmM0DvP
@@ -24,6 +26,8 @@ LQIDAQAB
 
     <div class="text-container">
         <h2>Client public key</h2>
+
+        <!--Put client public key here-->
         <textarea id="client_public">
 -----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAj3esh+8vIdSIb44d0yGB
@@ -39,6 +43,8 @@ rwIDAQAB
 
     <div  class="text-container">
         <h2>Client private key</h2>
+
+        <!--Put client private key here-->
         <textarea id="client_private">
 -----BEGIN PRIVATE KEY-----
 MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCPd6yH7y8h1Ihv
@@ -92,9 +98,11 @@ Oe6lSHTplzRc0QPTat5+mQ==
 
     // Test accepting and sending dummy message encrypted with RSA
     socket.on('rsa server encrypted message', function (msg) {
+
         // Test accepting dummy RSA message from server
         addLog('RSA server encrypted dummy message', msg);
 
+        // Decrypting server message using wrapper
         rsaWrapper.privateDecrypt(document.getElementById('client_private').value, msg).then(function (decrypted) {
             addLog('RSA server decrypted message', decrypted);
         });
@@ -102,6 +110,7 @@ Oe6lSHTplzRc0QPTat5+mQ==
         // Test send to server dummy RSA message
         rsaWrapper.publicEncrypt(document.getElementById('server_public').value, 'Hello from client with RSA').then(function (encrypted) {
             addLog('RSA encrypted base64 message from client', encrypted);
+            // emit encryption client message to server
             socket.emit('rsa client encrypted message', encrypted);
         });
     });
@@ -109,11 +118,15 @@ Oe6lSHTplzRc0QPTat5+mQ==
     // Test accepting RSA encrypted AES key and sending AES encrypted message to server
     socket.on('send key from server to client', function (data) {
         addLog('Accepting RSA encrypted AES key', data);
+        // Decrypting RSA encrypted AES key message
         rsaWrapper.privateDecrypt(document.getElementById('client_private').value, data).then(function (key) {
             addLog('Decrypted AES key from server in base64 format', key);
             aesKey = key;
+
+            // encrypting test AES message from client to server
             aesWrapper.encryptMessage(key, 'Hello from client with AES').then(function (encrypted) {
                 addLog('Encrypted AES message from client to server in base64 format', encrypted);
+                //sending encrypting AES message
                 socket.emit('aes client encrypted message', encrypted);
             })
         });
@@ -122,6 +135,7 @@ Oe6lSHTplzRc0QPTat5+mQ==
     // Test decrypting AES message from server
     socket.on('aes server encrypted message', function (msg) {
         addLog('Encrypted AES message from server', msg);
+        // Decrypting AES message from server
         aesWrapper.decryptMessage(aesKey, msg).then(function (dec) {
             addLog('Decrypted AES message from server', dec);
         });

@@ -4,7 +4,7 @@ const fs = require('fs');
 const NodeRSA = require('node-rsa');
 const crypto = require('crypto');
 
-
+// load keys from file
 rsaWrapper.initLoadServerKeys = (basePath) => {
     rsaWrapper.serverPub = fs.readFileSync(path.resolve(basePath, 'keys', 'server.public.pem'));
     rsaWrapper.serverPrivate = fs.readFileSync(path.resolve(basePath, 'keys', 'server.private.pem'));

@@ -4,6 +4,7 @@
 
     var crypto = window.crypto.subtle;
 
+    // wrapper for importing AES key for using with crypto library
     function importPublicKey(key){
         return new Promise(function (resolve, rej) {
             crypto.importKey("raw", converterWrapper.base64StringToArrayBuffer(key),
@@ -17,7 +18,8 @@
             });
         });
     }
-    
+
+    // separate initialization vector from message
     function separateVectorFromData(data) {
         var iv = data.slice(-24);
         var message = data.substring(0, data.length - 24)
@@ -27,10 +29,12 @@
             message: message
         };
     }
-    
+
+    // add initialization vector to message
     function getMessageWithIv(message, iv) {
         return converterWrapper.arrayBufferToBase64String(message) + converterWrapper.arrayBufferToBase64String(iv);
     }
+
 
     function encryptMessage(key, message) {
 

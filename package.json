@@ -7,5 +7,9 @@
     "io": "^0.1.10",
     "node-rsa": "^0.4.2",
     "socket.io": "^1.7.2"
+  },
+  "scripts":{
+    "generate": "node init",
+    "start": "node index.js"
   }
 }

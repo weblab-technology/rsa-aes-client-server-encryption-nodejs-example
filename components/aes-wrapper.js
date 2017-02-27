@@ -2,6 +2,7 @@ const crypto = require('crypto');
 
 const aesWrapper = {};
 
+// get list of supportable encryption algorithms
 aesWrapper.getAlgorithmList = () => {
     console.log(crypto.getCiphers());
 };
@@ -14,6 +15,7 @@ aesWrapper.generateIv = () => {
     return crypto.randomBytes(16);
 };
 
+// separate initialization vector from message
 aesWrapper.separateVectorFromData = (data) =>  {
     console.log(data);
     console.log('data');
@@ -45,6 +47,7 @@ aesWrapper.decrypt = (key, text) => {
     return dec;
 };
 
+// add initialization vector to message
 aesWrapper.addIvToBody = (iv, encryptedBase64) => {
     encryptedBase64 += iv.toString('base64');
     console.log(iv.toString('base64'));
