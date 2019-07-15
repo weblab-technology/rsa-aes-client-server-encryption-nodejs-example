@@ -14,8 +14,8 @@ rsaWrapper.initLoadServerKeys = (basePath) => {
 rsaWrapper.generate = (direction) => {
     let key = new NodeRSA();
     key.generateKeyPair(2048, 65537);
-    fs.writeFileSync(path.resolve(__dirname, 'keys', direction + '.private.pem'), key.exportKey('pkcs8-private-pem'));
-    fs.writeFileSync(path.resolve(__dirname, 'keys', direction + '.public.pem'), key.exportKey('pkcs8-public-pem'));
+    fs.writeFileSync(path.resolve(__dirname, '../keys', direction + '.private.pem'), key.exportKey('pkcs8-private-pem'));
+    fs.writeFileSync(path.resolve(__dirname, '../keys', direction + '.public.pem'), key.exportKey('pkcs8-public-pem'));
 
     return true;
 };
